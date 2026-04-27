@@ -34,17 +34,6 @@
 
 ---
 
-## 🖼️ Screenshot
-
-<div align="center">
-
-| OFF | ON |
-|---|---|
-| Normal YouTube playback | Video hidden · Audio playing · Data saved |
-
-</div>
-
----
 
 ## 🚀 Installation
 
