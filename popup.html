@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YT Audio Only</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --border: #2a2a2a;
+      --red: #ff0033;
+      --red-glow: rgba(255, 0, 51, 0.3);
+      --green: #00e676;
+      --green-glow: rgba(0, 230, 118, 0.25);
+      --text: #f0f0f0;
+      --muted: #666;
+      --accent: #ff4500;
+    }
+
+    body {
+      width: 300px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 20px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .title-block h1 {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    .title-block p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .version {
+      margin-left: auto;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--surface);
+      padding: 3px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .main {
+      padding: 20px;
+    }
+
+    /* Toggle card */
+    .toggle-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      user-select: none;
+    }
+
+    .toggle-card:hover {
+      border-color: #444;
+    }
+
+    .toggle-card.active {
+      border-color: var(--green);
+      box-shadow: 0 0 20px var(--green-glow);
+    }
+
+    .toggle-icon {
+      font-size: 28px;
+      line-height: 1;
+      transition: transform 0.3s;
+    }
+
+    .toggle-card.active .toggle-icon {
+      transform: scale(1.1);
+    }
+
+    .toggle-text h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .toggle-text p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Custom toggle switch */
+    .switch {
+      margin-left: auto;
+      flex-shrink: 0;
+      width: 44px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 100px;
+      position: relative;
+      transition: background 0.25s;
+      cursor: pointer;
+    }
+
+    .switch::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #555;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.25s, background 0.25s;
+    }
+
+    .switch.on {
+      background: var(--green);
+    }
+
+    .switch.on::after {
+      transform: translateX(20px);
+      background: #fff;
+    }
+
+    /* Status badge */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s, box-shadow 0.3s;
+      flex-shrink: 0;
+    }
+
+    .dot.active {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 12px;
+      color: var(--muted);
+      transition: color 0.3s;
+    }
+
+    .status-text.active {
+      color: var(--green);
+    }
+
+    /* Info rows */
+    .info-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .info-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .info-tile .val {
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .info-tile .label {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    /* Tips */
+    .tip {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(255, 69, 0, 0.08);
+      border: 1px solid rgba(255, 69, 0, 0.2);
+      border-radius: 10px;
+      font-size: 11px;
+      color: #aaa;
+      line-height: 1.5;
+    }
+
+    .tip span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Reload notice */
+    .reload-notice {
+      display: none;
+      margin-top: 12px;
+      padding: 9px 14px;
+      background: rgba(255, 200, 0, 0.07);
+      border: 1px solid rgba(255, 200, 0, 0.2);
+      border-radius: 10px;
+      font-size: 11px;
+      color: #ccc;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .reload-notice.show {
+      display: flex;
+    }
+
+    .reload-btn {
+      margin-left: auto;
+      font-size: 11px;
+      background: rgba(255, 200, 0, 0.15);
+      border: 1px solid rgba(255, 200, 0, 0.3);
+      color: #ffd740;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .reload-btn:hover {
+      background: rgba(255, 200, 0, 0.25);
+    }
+
+    .footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo"><img src="icons/logo.png" alt="YT Audio Only" /></div>
+    <div class="title-block">
+      <h1>YT AUDIO ONLY</h1>
+      <p>Save data on YouTube</p>
+    </div>
+    <div class="version">v1.0</div>
+  </div>
+
+  <div class="main">
+
+    <div class="toggle-card" id="toggleCard">
+      <div class="toggle-icon">🔇</div>
+      <div class="toggle-text">
+        <h2>Audio Only Mode</h2>
+        <p>Block video, keep audio</p>
+      </div>
+      <div class="switch" id="switch"></div>
+    </div>
+
+    <div class="status-row">
+      <div class="dot" id="dot"></div>
+      <span class="status-text" id="statusText">Disabled — video playing normally</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-tile">
+        <div class="val">~80%</div>
+        <div class="label">Data Saved</div>
+      </div>
+      <div class="info-tile">
+        <div class="val">Audio</div>
+        <div class="label">Stream Only</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span>Tip:</span> Toggle applies to the current tab immediately.
+      Reload the page for best results on already-loaded videos.
+    </div>
+
+    <div class="reload-notice" id="reloadNotice">
+      ⚡ Reload page to fully apply changes
+      <button class="reload-btn" id="reloadBtn">Reload</button>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Developed by <strong style="color:#ff4500;">Randun Labs</strong> · No data collected
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
